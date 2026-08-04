@@ -16,4 +16,4 @@ def post_detail(request, slug):
     return render(request, 'blog/post_detail.html', {'post': post})
 
 def about(request):
-    return HttpResponse("<h1>I stu`d`y at Texas</h1>")
+    return HttpResponse("<h1>I study at Texas</h1>")
