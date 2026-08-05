@@ -1,4 +1,15 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
+{% block title %}{{post.title}}{% endblock %}
+
+{% block content %}
+    <h1>{{post.title}}</h1>
+    <p>{{post.content}}</p>
+    <p>Category: {{post.category}}</p>
+    <p>At {{post.created_at}} by {{post.author}}</p>
+{% endblock %}
+
+
+{% comment %} <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,4 +22,4 @@
     <p>Category: {{post.category}}</p>
     <p>At {{post.created_at}} by {{post.author}}</p>
 </body>
-</html>
+</html> {% endcomment %}
