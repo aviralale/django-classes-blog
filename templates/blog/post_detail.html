@@ -6,6 +6,36 @@
     <p>{{post.content}}</p>
     <p>Category: {{post.category}}</p>
     <p>At {{post.created_at}} by {{post.author}}</p>
+    <h2>Comments</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if errors %}
+        <ul style="color:red;">
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <label for="username">Your name:</label>
+        <input type="text" id="username" name="name" value={{ name }}>
+        <label for="comment">Comment:</label>
+        <textarea name="content" id="comment" value={{ content }}></textarea>
+        <button type="submit">Post a comment</button>
+    </form>
+
+
+    {% for comment in post.comments.all %}
+    <div>
+        <strong>{{comment.name}}</strong>
+        <p>{{comment.content}}</p>
+        <p>{{comment.created_at}}</p>
+    </div>
+    {% empty %}
+        <p>No comments yet.</p>
+    {% endfor %}
 {% endblock %}
 
 

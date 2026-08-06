@@ -11,6 +11,7 @@ class Category(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
+    featured_image = models.ImageField(upload_to='blog_images/', default='blog_images/default.png')
     #https://blog.ctrlbits.com/post/software-development-life-cycle-for-2026-developers
     slug = models.CharField(max_length=100, unique=True, blank=True)
     author = models.CharField(max_length=100)
@@ -36,3 +37,11 @@ class Post(models.Model):
         return self.title
     
     
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    name = models.CharField(max_length=100)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment by {self.name} on {self.post.title}"

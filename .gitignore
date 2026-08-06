@@ -66,3 +66,5 @@ coverage.xml
 Thumbs.db
 
 *.docx
+
+*-class.md

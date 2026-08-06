@@ -4,10 +4,20 @@
 
 {% block content %}
     <h1>Welcome to my blog</h1>
+    <h2>Categories</h2>
+    <ul>
+        {% for category in categories %}
+            <li>{{ category.name }}</li>
+        {% endfor %}
+    </ul>
     <h2>Latest Posts</h2>
     {% for post in posts %}
         <div>
-            <a href={% url 'blog:post_detail' post.slug %}><h3>{{post.title}}</h3></a>
+            <a href={% url 'blog:post_detail' post.slug %}>
+                <img src={{post.featured_image.url}} alt={{post.title}} width="400"/>
+                <h3>{{post.title}}</h3>
+            
+            </a>
             <p>{{post.content}}</p>
             <p> Category: {{post.category.name}}</p>
             <p>At {{post.created_at}} by {{post.author}}</p>
