@@ -1,6 +1,9 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.text import Truncator, slugify
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 # Create your models here.
 class Category(models.Model):
@@ -15,11 +18,11 @@ class Category(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=100)
-    content = models.TextField()
+    content = models.TextField(max_length=100)
     featured_image = models.ImageField(upload_to='blog_images/', default='blog_images/default.png')
     #https://blog.ctrlbits.com/post/software-development-life-cycle-for-2026-developers
     slug = models.CharField(max_length=100, unique=True, blank=True)
-    author = models.CharField(max_length=100)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts', null=True)
     # category = models.CharField(max_length=100)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

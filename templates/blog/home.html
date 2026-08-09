@@ -15,7 +15,7 @@
                 {% endif %}
                 <h1 class="lead__title"><a href="{{ lead.get_absolute_url }}">{{ lead.title }}</a></h1>
                 <p class="dek">{{ lead.excerpt }}</p>
-                <p class="meta">{{ lead.author }} &nbsp;·&nbsp; {{ lead.created_at|date:"j F Y" }} &nbsp;·&nbsp; {{ lead.reading_time }} min read</p>
+                <p class="meta">{{ lead.author.username }} &nbsp;·&nbsp; {{ lead.created_at|date:"j F Y" }} &nbsp;·&nbsp; {{ lead.reading_time }} min read</p>
             </div>
 
             <figure class="lead__figure">

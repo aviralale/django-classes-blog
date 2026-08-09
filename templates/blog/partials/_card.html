@@ -13,5 +13,5 @@
 
     <p class="card__excerpt">{{ post.excerpt }}</p>
 
-    <p class="meta card__foot">{{ post.author }} · {{ post.created_at|date:"j M Y" }} · {{ post.reading_time }} min</p>
+    <p class="meta card__foot">{{ post.author.username }} · {{ post.created_at|date:"j M Y" }} · {{ post.reading_time }} min</p>
 </article>

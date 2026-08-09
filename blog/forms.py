@@ -15,14 +15,13 @@ class StyledForm(forms.ModelForm):
 class PostForm(StyledForm):
     class Meta:
         model = Post
-        fields = ['title', 'content', 'featured_image', 'category', 'author']
+        fields = ['title', 'content', 'featured_image', 'category']
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Give it a headline worth clicking'}),
             'content': forms.Textarea(attrs={
                 'rows': 14,
                 'placeholder': 'Start writing. Blank lines make new paragraphs.',
             }),
-            'author': forms.TextInput(attrs={'placeholder': 'Who wrote this?'}),
         }
         help_texts = {
             'title': 'The URL or slug is auto-generated from the title.',

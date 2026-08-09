@@ -23,8 +23,23 @@
                 <ul class="nav">
                     <li><a href="{% url 'blog:home' %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>Latest</a></li>
                     <li><a href="{% url 'blog:post_list' %}" {% if request.resolver_match.url_name == 'post_list' %}aria-current="page"{% endif %}>Archive</a></li>
-                    <li><a href="{% url 'blog:post_create' %}" {% if request.resolver_match.url_name == 'post_create' %}aria-current="page"{% endif %}>Write</a></li>
                     <li><a href="{% url 'blog:about' %}" {% if request.resolver_match.url_name == 'about' %}aria-current="page"{% endif %}>About</a></li>
+                    
+                    {% if user.is_authenticated %}
+                    <li>Hello, {{ user.username }}</li>
+                    <li><a href="{% url 'blog:post_create' %}" {% if request.resolver_match.url_name == 'post_create' %}aria-current="page"{% endif %}>Write</a></li>
+                    <li>
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit">Log out</button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}">Sign up</a></li>
+                    {% endif %}
+
+
                 </ul>
             </nav>
         </div>
