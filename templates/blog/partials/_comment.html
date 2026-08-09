@@ -1,0 +1,30 @@
+{% load blog_extras %}
+<article class="comment {% if not comment.is_approved %}comment--hidden{% endif %}">
+    <div class="comment__head">
+        <span class="comment__mark" aria-hidden="true">{{ comment.author|initials }}</span>
+        <span class="comment__name">{{ comment.author|display_name }}</span>
+        <span class="meta">{{ comment.created_at|date:"j M Y" }}</span>
+        {% if not comment.is_approved %}
+            <span class="badge badge--muted">Hidden</span>
+        {% endif %}
+    </div>
+
+    <div class="comment__body">{{ comment.content|linebreaks }}</div>
+
+    {% if comment.author == user or perms.blog.can_moderate_comment %}
+        <p class="comment__tools">
+            {% if perms.blog.can_moderate_comment %}
+                <form method="post" action="{% url 'blog:comment_toggle' comment.pk %}" class="inline-form">
+                    {% csrf_token %}
+                    <button class="linkish" type="submit">
+                        {% if comment.is_approved %}Hide{% else %}Restore{% endif %}
+                    </button>
+                </form>
+            {% endif %}
+            <form method="post" action="{% url 'blog:comment_delete' comment.pk %}" class="inline-form">
+                {% csrf_token %}
+                <button class="linkish linkish--danger" type="submit">Delete</button>
+            </form>
+        </p>
+    {% endif %}
+</article>

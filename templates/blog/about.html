@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load blog_extras %}
 
 {% block title %}About{% endblock %}
 
@@ -38,13 +39,22 @@
         <ul class="rail">
             {% for category in categories %}
                 <li>
-                    <a class="chip" href="{% url 'blog:post_list' %}?category={{ category.pk }}">
+                    <a class="chip" href="{{ category.get_absolute_url }}">
                         {{ category.name }}<span class="chip__count">{{ category.post_count }}</span>
                     </a>
                 </li>
             {% endfor %}
         </ul>
     {% endif %}
+
+    {% comment %}
+    An inclusion tag, not an {% include %}: no view put these in the context,
+    the tag fetches them itself. See blog/templatetags/blog_extras.py.
+    {% endcomment %}
+    <div class="section-rule" style="margin-top:3rem">
+        <h2 class="kicker">Most recent</h2>
+    </div>
+    {% recent_posts 4 %}
 
 </div>
 {% endblock %}

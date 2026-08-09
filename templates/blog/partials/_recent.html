@@ -1,0 +1,14 @@
+{% comment %}
+Rendered by the {% recent_posts %} inclusion tag in blog/templatetags/blog_extras.py.
+Its context is whatever that function returns — nothing else is in scope here.
+{% endcomment %}
+<ul class="stack">
+    {% for post in posts %}
+        <li>
+            <a class="stack__title" href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+            <span class="meta">{{ post.published_at|date:"j M Y" }}</span>
+        </li>
+    {% empty %}
+        <li class="meta">Nothing published yet.</li>
+    {% endfor %}
+</ul>

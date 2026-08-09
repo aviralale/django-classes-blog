@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+<div class="shell">
+
+    <p class="kicker kicker--accent">Section</p>
+    <h1 style="font-size:clamp(2rem,4.5vw,2.75rem);margin:.6rem 0 .5rem">{{ category.name }}</h1>
+
+    {% if category.description %}
+        <p class="dek">{{ category.description }}</p>
+    {% endif %}
+
+    <p class="meta">{{ total }} piece{{ total|pluralize }} filed here</p>
+
+    <hr class="hairline" style="margin:1.25rem 0 0">
+
+    <div class="grid">
+        {% for post in posts %}
+            {% include 'blog/partials/_card.html' %}
+        {% empty %}
+            <p class="empty">This section is empty. Someone should fix that.</p>
+        {% endfor %}
+    </div>
+
+    {% include 'blog/partials/_pagination.html' %}
+
+    <p class="ornament">❦</p>
+
+    <p class="meta" style="text-align:center">
+        <a href="{% url 'blog:post_list' %}">Back to the full archive</a>
+    </p>
+
+</div>
+{% endblock %}

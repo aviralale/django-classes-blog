@@ -682,6 +682,195 @@ p { margin: 0 0 1.15em; }
 .footer a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid var(--rule-strong); }
 .footer a:hover { color: var(--accent); border-color: var(--accent); }
 
+/* ===========================================================
+   Editorial furniture: status, moderation and the desk
+   Everything below arrived with drafts, permissions and the
+   signed-comment rewrite.
+   =========================================================== */
+
+/* --- a button that reads as a link (log out, hide, delete) ------- */
+.linkish {
+  font-family: var(--font-meta);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  padding: 0 0 3px;
+  cursor: pointer;
+  transition: color .15s ease, border-color .15s ease;
+}
+
+.linkish:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.linkish--danger:hover { color: var(--accent); }
+
+/* forms that hold a single button and must sit inline with text */
+.inline-form { display: inline; margin: 0; }
+
+.nav__form { display: inline; }
+.nav__user {
+  font-family: var(--font-meta);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* --- messages framework ------------------------------------------ */
+.messages { padding-top: 1.75rem; }
+
+.message {
+  font-family: var(--font-meta);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--rule-strong);
+  border-left-width: 3px;
+  background: rgba(255,253,247,.7);
+  padding: 0.75rem 1rem;
+  margin: 0 0 0.5rem;
+}
+
+.message--success { border-left-color: #56604a; }
+.message--warning { border-left-color: #966e2a; }
+.message--error   { border-left-color: var(--accent); }
+.message--info    { border-left-color: #2b3a55; }
+
+/* --- draft badges and the draft banner --------------------------- */
+.badge {
+  display: inline-block;
+  font-family: var(--font-meta);
+  font-size: 0.5625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--rule-strong);
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.badge--draft { color: var(--accent); border-color: var(--accent); }
+.badge--muted { color: var(--ink-faint); border-style: dashed; }
+
+.banner {
+  border: 1px solid var(--accent);
+  border-left-width: 3px;
+  background: rgba(138,47,34,.05);
+  padding: 0.9rem 1.15rem;
+  margin-bottom: 2.5rem;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+.card__kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 0.35rem;
+}
+
+.card__kicker .kicker { margin: 0; }
+
+/* --- the small action row under a headline ----------------------- */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-top: 1.4rem;
+}
+
+.btn--small { padding: 0.5rem 1rem; font-size: 0.625rem; }
+.btn--danger { border-color: var(--accent); color: var(--accent); }
+.btn--danger:hover { background: var(--accent); color: var(--paper); }
+
+/* --- comments: initials block and moderation row ----------------- */
+.comment__mark {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  font-family: var(--font-meta);
+  font-size: 0.625rem;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  background: var(--ink);
+}
+
+.comment--hidden { opacity: .6; border-left: 2px solid var(--rule-strong); padding-left: 1rem; }
+
+.comment__tools { display: flex; gap: 1.25rem; margin: 0.5rem 0 0; }
+
+/* --- pagination --------------------------------------------------- */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: var(--page);
+  margin: 3rem 0 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-meta);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.pagination__step { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule-strong); }
+.pagination__step:hover { color: var(--accent); border-color: var(--accent); }
+.pagination__step--off { color: var(--ink-faint); border-bottom: 1px solid transparent; }
+.pagination__count { color: var(--ink-faint); }
+
+/* --- the desk: tables --------------------------------------------- */
+.table-wrap { overflow-x: auto; }
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+.table th {
+  font-family: var(--font-meta);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: left;
+  padding: 0 0.9rem 0.6rem 0;
+  border-bottom: 1px solid var(--ink);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 0.85rem 0.9rem 0.85rem 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: middle;
+}
+
+.table td a { text-decoration: none; border-bottom: 1px solid var(--rule-strong); }
+.table td a:hover { color: var(--accent); border-color: var(--accent); }
+.table__actions { display: flex; gap: 1rem; white-space: nowrap; }
+
+/* --- the {% recent_posts %} list ---------------------------------- */
+.stack { list-style: none; margin: 0; padding: 0; }
+.stack li { padding: 0.6rem 0; border-bottom: 1px solid var(--rule); }
+.stack__title { display: block; text-decoration: none; }
+.stack__title:hover { color: var(--accent); }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* --- responsive --------------------------------------------------- */
 @media (max-width: 980px) {
   .grid { grid-template-columns: repeat(2, 1fr); }

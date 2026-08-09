@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load blog_extras %}
+
+{% block title %}The desk{% endblock %}
+
+{% block content %}
+<div class="shell">
+
+    <p class="kicker kicker--accent">{{ user.username }}</p>
+    <h1 style="font-size:clamp(2rem,4.5vw,2.75rem);margin:.6rem 0 .4rem">The desk</h1>
+    <p class="dek">
+        {{ published_count }} published, {{ draft_count }} in the drawer.
+    </p>
+
+    <div class="section-rule">
+        <h2 class="kicker">Your pieces</h2>
+    </div>
+
+    {% if posts %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Section</th>
+                        <th>Status</th>
+                        <th>Comments</th>
+                        <th>Updated</th>
+                        <th><span class="visually-hidden">Actions</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in posts %}
+                        <tr>
+                            <td><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></td>
+                            <td class="meta">{{ post.category.name|default:"—" }}</td>
+                            <td>
+                                {% if post.is_published %}
+                                    <span class="badge">Published</span>
+                                {% else %}
+                                    <span class="badge badge--draft">Draft</span>
+                                {% endif %}
+                            </td>
+                            <td class="meta">{{ post.comment_count }}</td>
+                            <td class="meta">{{ post.updated_at|date:"j M Y" }}</td>
+                            <td class="table__actions">
+                                <a class="linkish" href="{% url 'blog:post_edit' post.slug %}">Edit</a>
+                                <form method="post" action="{% url 'blog:post_publish' post.slug %}" class="inline-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{% url 'blog:dashboard' %}">
+                                    <button class="linkish" type="submit">{% if post.is_published %}Unpublish{% else %}Publish{% endif %}</button>
+                                </form>
+                                <a class="linkish linkish--danger" href="{% url 'blog:post_delete' post.slug %}">Delete</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="empty">You have not written anything yet.</p>
+        {% if perms.blog.add_post %}
+            <p><a class="btn" href="{% url 'blog:post_create' %}">Start one</a></p>
+        {% endif %}
+    {% endif %}
+
+    {% comment %}
+    Everything below only renders for an Editor. `review_queue` and
+    `hidden_comments` are simply absent from the context for everyone else, and
+    a missing variable in a Django template is falsy, not an error.
+    {% endcomment %}
+    {% if review_queue %}
+        <div class="section-rule" style="margin-top:3.5rem">
+            <h2 class="kicker">Drafts by other people</h2>
+        </div>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr><th>Title</th><th>Author</th><th>Started</th><th><span class="visually-hidden">Actions</span></th></tr>
+                </thead>
+                <tbody>
+                    {% for post in review_queue %}
+                        <tr>
+                            <td><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></td>
+                            <td class="meta">{{ post.author|display_name }}</td>
+                            <td class="meta">{{ post.created_at|date:"j M Y" }}</td>
+                            <td class="table__actions">
+                                <form method="post" action="{% url 'blog:post_publish' post.slug %}" class="inline-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="next" value="{% url 'blog:dashboard' %}">
+                                    <button class="linkish" type="submit">Publish</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    {% if hidden_comments %}
+        <div class="section-rule" style="margin-top:3.5rem">
+            <h2 class="kicker">Hidden comments</h2>
+        </div>
+        {% for comment in hidden_comments %}
+            <article class="comment comment--hidden">
+                <div class="comment__head">
+                    <span class="comment__name">{{ comment.author|display_name }}</span>
+                    <span class="meta">on <a href="{{ comment.post.get_absolute_url }}">{{ comment.post.title }}</a></span>
+                </div>
+                <div class="comment__body">{{ comment.content|linebreaks }}</div>
+                <p class="comment__tools">
+                    <form method="post" action="{% url 'blog:comment_toggle' comment.pk %}" class="inline-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'blog:dashboard' %}">
+                        <button class="linkish" type="submit">Restore</button>
+                    </form>
+                </p>
+            </article>
+        {% endfor %}
+    {% endif %}
+
+</div>
+{% endblock %}

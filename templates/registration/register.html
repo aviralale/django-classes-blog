@@ -1,23 +1,38 @@
 {% extends 'base.html' %}
 
-{% block title%} Signup {% endblock %}
+{% block title %}Sign up{% endblock %}
 
 {% block content %}
-<h1>Create an account</h1>
+<div class="shell shell--narrow">
 
-<form method="post">
-    {% csrf_token %}
-    {% for field in form %}
-        <div>
-            {{ field.label_tag}} {{ field }}
-            {% if field.help_text %}
-                <small class="form-text text-muted">{{ field.help_text }}</small>
-            {% endif %}
-            {{ field.errors }}
-        </div>
-    {% endfor %}
-    <button type="submit">Sign up</button>
+    <header class="article__head">
+        <p class="kicker kicker--accent">New here</p>
+        <h1 class="article__title" style="font-size:clamp(2rem,4.5vw,2.6rem)">Create an account</h1>
+        <p class="dek">
+            You get a byline and a desk. New accounts join the
+            <strong>Authors</strong> group, so you can publish straight away.
+        </p>
+    </header>
 
-</form>
+    <form class="form" method="post" novalidate>
+        {% csrf_token %}
 
+        {% if form.non_field_errors %}
+            <div class="notice">
+                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            {% include 'blog/partials/_field.html' %}
+        {% endfor %}
+
+        <button class="btn" type="submit">Sign up</button>
+    </form>
+
+    <p class="meta" style="text-align:center;margin-top:2rem">
+        Already have one? <a href="{% url 'login' %}">Log in</a>.
+    </p>
+
+</div>
 {% endblock %}

@@ -1,25 +1,42 @@
 {% extends 'base.html' %}
 
-{% block title%} Login {% endblock %}
+{% block title %}Log in{% endblock %}
 
 {% block content %}
-<h1>Welcome back!</h1>
+<div class="shell shell--narrow">
 
-<form method="post">
-    {% csrf_token %}
-    {% for field in form %}
-        <div>
-            {{ field.label_tag}} {{ field }}
-            {% if field.help_text %}
-                <small class="form-text text-muted">{{ field.help_text }}</small>
-            {% endif %}
-            {{ field.errors }}
-        </div>
-    {% endfor %}
-    <button type="submit">Login</button>
-    <p>
-       New to blog? <a href="{% url 'register' %}">Create account.</a>
+    <header class="article__head">
+        <p class="kicker kicker--accent">The door</p>
+        <h1 class="article__title" style="font-size:clamp(2rem,4.5vw,2.6rem)">Welcome back</h1>
+        <p class="dek">Sign in to write, or to leave a comment with your name on it.</p>
+    </header>
+
+    <form class="form" method="post" novalidate>
+        {% csrf_token %}
+
+        {% comment %}
+        LoginView puts a bad username/password in non_field_errors, not on a
+        single field — deliberately, so the page never says which half was wrong.
+        {% endcomment %}
+        {% if form.non_field_errors %}
+            <div class="notice">
+                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            {% include 'blog/partials/_field.html' %}
+        {% endfor %}
+
+        {# Carries ?next= through the POST so you land where you were headed. #}
+        <input type="hidden" name="next" value="{{ next }}">
+
+        <button class="btn" type="submit">Log in</button>
+    </form>
+
+    <p class="meta" style="text-align:center;margin-top:2rem">
+        No account? <a href="{% url 'register' %}">Make one</a> — it takes ten seconds.
     </p>
-</form>
 
+</div>
 {% endblock %}

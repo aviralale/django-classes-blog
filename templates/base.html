@@ -24,27 +24,38 @@
                     <li><a href="{% url 'blog:home' %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>Latest</a></li>
                     <li><a href="{% url 'blog:post_list' %}" {% if request.resolver_match.url_name == 'post_list' %}aria-current="page"{% endif %}>Archive</a></li>
                     <li><a href="{% url 'blog:about' %}" {% if request.resolver_match.url_name == 'about' %}aria-current="page"{% endif %}>About</a></li>
-                    
+
                     {% if user.is_authenticated %}
-                    <li>Hello, {{ user.username }}</li>
-                    <li><a href="{% url 'blog:post_create' %}" {% if request.resolver_match.url_name == 'post_create' %}aria-current="page"{% endif %}>Write</a></li>
-                    <li>
-                        <form method="post" action="{% url 'logout' %}">
-                            {% csrf_token %}
-                            <button type="submit">Log out</button>
-                        </form>
-                    </li>
+                        {# `perms` is injected by the auth context processor. #}
+                        {% if perms.blog.add_post %}
+                            <li><a href="{% url 'blog:post_create' %}" {% if request.resolver_match.url_name == 'post_create' %}aria-current="page"{% endif %}>Write</a></li>
+                        {% endif %}
+                        <li><a href="{% url 'blog:dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}aria-current="page"{% endif %}>Desk</a></li>
+                        <li class="nav__user">{{ user.username }}</li>
+                        <li>
+                            {# Logging out changes state, so it is a POST, not a link. #}
+                            <form method="post" action="{% url 'logout' %}" class="nav__form">
+                                {% csrf_token %}
+                                <button type="submit" class="linkish">Log out</button>
+                            </form>
+                        </li>
                     {% else %}
-                    <li><a href="{% url 'login' %}">Login</a></li>
-                    <li><a href="{% url 'register' %}">Sign up</a></li>
+                        <li><a href="{% url 'login' %}">Log in</a></li>
+                        <li><a href="{% url 'register' %}">Sign up</a></li>
                     {% endif %}
-
-
                 </ul>
             </nav>
         </div>
         <hr class="masthead__rule">
     </header>
+
+    {% if messages %}
+        <div class="shell messages" role="status">
+            {% for message in messages %}
+                <p class="message message--{{ message.tags|default:'info' }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <main>
         {% block content %}{% endblock %}
@@ -53,7 +64,10 @@
     <footer class="footer">
         <div class="footer__inner">
             <p class="meta" style="margin:0">© {% now "Y" %} Ctrl Bits — written by hand</p>
-            <p class="meta" style="margin:0">Set in Fraunces &amp; EB&nbsp;Garamond · <a href="{% url 'blog:post_create' %}">Submit a piece</a></p>
+            <p class="meta" style="margin:0">
+                Set in Fraunces &amp; EB&nbsp;Garamond
+                {% if perms.blog.add_post %} · <a href="{% url 'blog:post_create' %}">Submit a piece</a>{% endif %}
+            </p>
         </div>
     </footer>
 </body>

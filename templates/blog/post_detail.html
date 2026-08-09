@@ -1,24 +1,49 @@
 {% extends 'base.html' %}
+{% load blog_extras %}
 
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
 <div class="shell shell--narrow">
 
+    {% if not post.is_published %}
+        <div class="banner">
+            <strong>Draft.</strong> Only you and the editors can see this page.
+            Publish it when it is ready.
+        </div>
+    {% endif %}
+
     <header class="article__head">
         {% if post.category %}
-            <p class="kicker kicker--accent">{{ post.category.name }}</p>
+            <p class="kicker kicker--accent"><a href="{{ post.category.get_absolute_url }}">{{ post.category.name }}</a></p>
         {% endif %}
 
         <h1 class="article__title">{{ post.title }}</h1>
 
         <p class="article__byline">
-            <span class="meta">By {{ post.author }}</span>
+            <span class="meta">By {{ post.author|display_name }}</span>
             <span class="dot">·</span>
-            <span class="meta">{{ post.created_at|date:"j F Y" }}</span>
+            <span class="meta">{{ post.published_at|default:post.created_at|date:"j F Y" }}</span>
             <span class="dot">·</span>
             <span class="meta">{{ post.reading_time }} min read</span>
         </p>
+
+        {% if can_edit or can_delete %}
+            <p class="toolbar">
+                {% if can_edit %}
+                    <a class="btn btn--small btn--ghost" href="{% url 'blog:post_edit' post.slug %}">Edit</a>
+                    <form method="post" action="{% url 'blog:post_publish' post.slug %}" class="inline-form">
+                        {% csrf_token %}
+                        <button class="btn btn--small btn--ghost" type="submit">
+                            {% if post.is_published %}Move to draft{% else %}Publish{% endif %}
+                        </button>
+                    </form>
+                {% endif %}
+                {% if can_delete %}
+                    <a class="btn btn--small btn--ghost btn--danger" href="{% url 'blog:post_delete' post.slug %}">Delete</a>
+                {% endif %}
+            </p>
+        {% endif %}
     </header>
 
     <figure class="article__figure">
@@ -29,42 +54,46 @@
 
     <p class="ornament">✦ ✦ ✦</p>
 
-    <section class="comments">
+    <section class="comments" id="comments">
         <div class="section-rule">
             <h2 class="kicker">Comments ({{ comments|length }})</h2>
         </div>
 
         {% for comment in comments %}
-            <article class="comment">
-                <div class="comment__head">
-                    <span class="comment__name">{{ comment.name }}</span>
-                    <span class="meta">{{ comment.created_at|date:"j M Y" }}</span>
-                </div>
-                <div class="comment__body">{{ comment.content|linebreaks }}</div>
-            </article>
+            {% include 'blog/partials/_comment.html' %}
         {% empty %}
             <p class="empty">No comments yet. Somebody has to go first.</p>
         {% endfor %}
 
         <hr class="hairline">
 
-        <form class="form" method="post" novalidate>
-            {% csrf_token %}
+        {% if user.is_authenticated %}
+            <form class="form" method="post" novalidate>
+                {% csrf_token %}
 
-            <p class="kicker" style="margin-bottom:1.25rem">Leave a comment</p>
+                <p class="kicker" style="margin-bottom:1.25rem">
+                    Leave a comment as <strong>{{ user.username }}</strong>
+                </p>
 
-            {% if form.non_field_errors %}
-                <div class="notice">
-                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
-                </div>
-            {% endif %}
+                {% if form.non_field_errors %}
+                    <div class="notice">
+                        {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                    </div>
+                {% endif %}
 
-            {% for field in form %}
-                {% include 'blog/partials/_field.html' %}
-            {% endfor %}
+                {% for field in form %}
+                    {% include 'blog/partials/_field.html' %}
+                {% endfor %}
 
-            <button class="btn" type="submit">Post comment</button>
-        </form>
+                <button class="btn" type="submit">Post comment</button>
+            </form>
+        {% else %}
+            <p class="empty">
+                Comments are signed here — no drive-by anonymous takes.
+                <a href="{% url 'login' %}?next={{ request.path }}">Log in</a>
+                or <a href="{% url 'register' %}">make an account</a> to join in.
+            </p>
+        {% endif %}
     </section>
 
     {% if related %}

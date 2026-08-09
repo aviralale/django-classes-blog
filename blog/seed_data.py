@@ -1,14 +1,58 @@
-"""The articles the seed command publishes.
+"""The data `manage.py seed_blog` writes into an empty database.
 
-Plain prose, blank line between paragraphs, which is exactly what the
+Three lists, no logic. Keeping the *content* separate from the *command* means
+you can add an article without touching a line of Django, and the command stays
+short enough to read in one sitting.
+
+Prose is plain, with a blank line between paragraphs — exactly what the
 `linebreaks` filter expects in the template.
 """
 
+# Everyone with an account on the demo site. `role` is a group from
+# blog/roles.py, and it is the whole permission story for that account:
+#
+#   Editors  — can publish and unpublish anyone's post, can moderate comments
+#   Authors  — can write, edit, publish and delete their *own* posts
+#   Readers  — can comment, and nothing else. /post/new/ gives them a 403.
+#
+# Every seeded account gets the same password, printed by the command.
+PEOPLE = [
+    {'username': 'aviral',          'first_name': 'Aviral',  'last_name': 'Ale',      'role': 'Editors'},
+    {'username': 'meghana',         'first_name': 'Meghana', 'last_name': 'Rao',      'role': 'Editors'},
+    {'username': 'rohan_dev',       'first_name': 'Rohan',   'last_name': 'Kulkarni', 'role': 'Authors'},
+    {'username': 'priya',           'first_name': 'Priya',   'last_name': 'Nair',     'role': 'Authors'},
+    {'username': 'nikhil',          'first_name': 'Nikhil',  'last_name': 'Menon',    'role': 'Authors'},
+    {'username': 'sanjay.k',        'first_name': 'Sanjay',  'last_name': 'Krishnan', 'role': 'Readers'},
+    {'username': 'half_awake_ops',  'first_name': '',        'last_name': '',         'role': 'Readers'},
+    {'username': 't.builds',        'first_name': '',        'last_name': '',         'role': 'Readers'},
+    {'username': 'ana_m',           'first_name': 'Ana',     'last_name': 'Moreira',  'role': 'Readers'},
+    {'username': 'devika',          'first_name': 'Devika',  'last_name': 'Sharma',   'role': 'Readers'},
+    {'username': 'marcus',          'first_name': 'Marcus',  'last_name': 'Bell',     'role': 'Readers'},
+    {'username': 'sam.qa',          'first_name': 'Sam',     'last_name': 'Ortiz',    'role': 'Readers'},
+    {'username': 'irfan',           'first_name': 'Irfan',   'last_name': 'Qureshi',  'role': 'Readers'},
+    {'username': 'lena',            'first_name': 'Lena',    'last_name': 'Fischer',  'role': 'Readers'},
+    {'username': 'bhaskar',         'first_name': 'Bhaskar', 'last_name': 'Iyer',     'role': 'Readers'},
+]
+
+DEMO_PASSWORD = 'deskpass123'
+
+# The sections, with the blurb that shows on /section/<slug>/.
+SECTIONS = {
+    'Django': 'The framework, its sharp edges, and the parts of it people never read.',
+    'The Web': 'Browsers, HTML, and the long argument about how much JavaScript is too much.',
+    'Engineering': 'Everything that is not code but decides whether the code survives.',
+    'Tooling': 'The machinery around the work: environments, editors, pipelines.',
+    'Testing': 'What to assert, what to skip, and how to stop testing the framework.',
+}
+
+# `status` is 'published' or 'draft'. Drafts are only visible to their author
+# and to the Editors — that is the whole point of seeding one.
 ARTICLES = [
     {
         'title': 'The N+1 query is the most expensive bug you will never see',
         'category': 'Django',
-        'author': 'Aviral Ale',
+        'author': 'aviral',
+        'status': 'published',
         'days_ago': 4,
         'content': """Your page takes four seconds to load and every line of code in it looks fine.
 
@@ -45,7 +89,8 @@ Count your queries first. Then decide what is actually broken.""",
     {
         'title': 'Your next migration is a production outage',
         'category': 'Django',
-        'author': 'Aviral Ale',
+        'author': 'priya',
+        'status': 'published',
         'days_ago': 17,
         'content': """The deploy was one column. The outage was eleven minutes.
 
@@ -84,7 +129,8 @@ Migrations are the only part of a deploy you cannot undo by redeploying the prev
     {
         'title': 'Most sites do not need a frontend framework',
         'category': 'The Web',
-        'author': 'Aviral Ale',
+        'author': 'nikhil',
+        'status': 'published',
         'days_ago': 31,
         'content': """The average marketing site now ships more JavaScript than the original Doom shipped as an entire game.
 
@@ -111,7 +157,8 @@ Use a framework when the interface earns it. Most interfaces do not.""",
     {
         'title': 'Nobody reads your logs, including you',
         'category': 'Engineering',
-        'author': 'Aviral Ale',
+        'author': 'aviral',
+        'status': 'published',
         'days_ago': 48,
         'content': """Every log line you write is a message to a stranger at 3am. The stranger is you, eight months from now, with no memory of this code and a pager going off.
 
@@ -140,7 +187,8 @@ Write the line you would want to find. Then delete the other forty.""",
     {
         'title': 'A pull request is not a code review',
         'category': 'Engineering',
-        'author': 'Aviral Ale',
+        'author': 'meghana',
+        'status': 'published',
         'days_ago': 66,
         'content': """Two approvals, four seconds of reading, LGTM. The process ran perfectly. Nobody reviewed anything.
 
@@ -171,7 +219,8 @@ LGTM is not a review. It is a shrug with a green icon.""",
     {
         'title': 'Your dev environment is a science experiment',
         'category': 'Tooling',
-        'author': 'Aviral Ale',
+        'author': 'rohan_dev',
+        'status': 'published',
         'days_ago': 84,
         'content': """The bug only happens on one laptop. That laptop has a different Python, an older libpq and a Node version installed in 2023 with a curl command nobody can remember.
 
@@ -195,10 +244,123 @@ Onboarding time is the honest metric. Watch a new person go through it without h
 
 Documentation is what you write when you have given up on automating something. Sometimes that is the right call. Usually it is just the cheaper one today.""",
     },
+    {
+        'title': 'The database is not a queue',
+        'category': 'Engineering',
+        'author': 'rohan_dev',
+        'status': 'published',
+        'days_ago': 97,
+        'content': """Every team builds a job queue out of a database table. Most of them build it twice, because the first one silently ran every job three times for a month.
+
+The design is always the same and always looks fine. A table with a status column. A worker that selects the oldest pending row, marks it running, does the work, marks it done. Ten lines. No new infrastructure, no new thing to operate, no new page in the runbook. On one worker it is flawless.
+
+Then you start a second worker, and both of them select the same row in the same millisecond, and the customer gets charged twice.
+
+The reason is that SELECT does not reserve anything. Two transactions can read the same row and both believe they own it. The fix people reach for first is to mark the row running immediately after selecting it, which narrows the window from milliseconds to microseconds and turns a reliable bug into an unreproducible one. That is worse.
+
+What you actually need is the database to hand out each row to exactly one worker. In Postgres that is SELECT ... FOR UPDATE SKIP LOCKED: lock the rows you took, and let every other worker walk straight past them instead of blocking. Django spells it select_for_update(skip_locked=True). It has to run inside a transaction, and it has to be the same transaction that marks the row as taken.
+
+That gets you correct dequeuing. It does not get you a queue.
+
+A queue also has to answer: what happens when a worker is killed mid-job. What happens when a job fails, and how many times do you retry before you stop. What happens to a job that fails permanently, and who looks at it. How do you know the backlog is growing. How do you schedule something for Tuesday. How do you stop one enormous customer starving everyone else.
+
+Each of those is a paragraph of code and a week of edge cases. That is the honest cost of the table you thought was free.
+
+So here is the line I would draw. If the work is small, idempotent, low-volume and nobody dies when it runs twice, a table plus SKIP LOCKED plus a lease timestamp is genuinely a good answer. It is one moving part, it is transactional with your data, and you can inspect it with SQL, which is more than you can say for most queue dashboards.
+
+If the work is any of: high volume, expensive, order-sensitive, or has retry semantics somebody will argue about in an incident review, use a real queue. Celery, RQ, SQS, whatever your infrastructure already has. Not because the table cannot be made to work, but because by the time you have made it work you will have written a worse queue than the one you could have installed on day one.
+
+The failure mode nobody warns you about is that the table version does not break loudly. It breaks statistically. One job in ten thousand runs twice, which is invisible until it is an invoice, and by then the code has been in production for a year and nobody remembers why the status column exists.
+
+Pick deliberately. Both answers are defensible. Drifting into one because it started as four lines in a cron job is not.""",
+    },
+    {
+        'title': 'Half your tests are testing Django',
+        'category': 'Testing',
+        'author': 'meghana',
+        'status': 'published',
+        'days_ago': 110,
+        'content': """There is a test in your suite that creates a Post, saves it, reads it back, and asserts the title is the title you set.
+
+Delete it. You did not write that behaviour. The Django ORM did, it is tested by thousands of people, and your copy of that test has exactly one job: to fail spuriously on an upgrade and waste an afternoon.
+
+This is the most common way a test suite becomes expensive without becoming useful. Not too few tests. Too many tests pointed at code nobody on your team wrote.
+
+The rule I use is simple: test the sentence you would say to a colleague, not the mechanism underneath it. Nobody says the ORM stores a CharField. People do say a draft is invisible to everyone except its author, and that sentence is worth pinning down forever, because it is a rule your team invented and can therefore accidentally break.
+
+Look at what that gives you in a blog like this one. A draft is not visible to a logged-out visitor. A draft is not visible to a different author. A draft is visible to an editor. Publishing sets the publication date once and does not move it when you edit a typo the next day. A comment cannot be posted by someone who is not logged in. A comment can be deleted by its author and by a moderator and by nobody else. Six tests. All six describe decisions, not plumbing. All six will fail loudly on the day someone changes a queryset in a hurry.
+
+Then there is the second category people skip: the tests that describe your data rather than your logic. Slug collisions are the classic. Two posts called the same thing is not a hypothetical, it is a Tuesday, and the behaviour you want — second one gets a suffix, first one keeps its URL — is a decision you made and will forget. Write it down as a test.
+
+What about coverage numbers. Coverage is a thermometer, not a goal. It tells you which lines never ran, which is genuinely useful information, and it tells you nothing at all about whether the lines that ran did the right thing. A suite at ninety percent coverage made entirely of tests that assert Django works is worth less than fifteen tests that assert your rules hold.
+
+A few habits that make the difference.
+
+Use setUpTestData, not setUp, for fixtures that do not change. It runs once per class inside a transaction that is rolled back, instead of once per test. On a suite of two hundred tests that is often the difference between eight seconds and eighty.
+
+Assert on the response the user gets, not on internals. status_code 404 for a draft is the contract. Which queryset method produced it is not, and a test that asserts the method name breaks every time you refactor correctly.
+
+Give tests names that read like the rule. test_draft_is_invisible_to_other_authors tells you what broke from the failure output alone. test_post_detail_2 requires archaeology.
+
+And write the test that would have caught the last bug you shipped. Not a suite. One test. Do that every time and in six months you will have a suite that is entirely made of things that actually went wrong, which is the only test suite anyone has ever trusted.""",
+    },
+    {
+        'title': 'Caching is a bet about the future',
+        'category': 'Engineering',
+        'author': 'aviral',
+        'status': 'published',
+        'days_ago': 124,
+        'content': """A cache is a promise that the world will not change in the next sixty seconds. Sometimes you are right. The interesting part is what happens when you are wrong.
+
+People reach for caching as though it were a performance setting — a dial you turn when the page is slow. It is not. It is a second copy of your data with its own lifetime, its own failure modes and its own bugs, and you are adding it to a system that already had enough of all three.
+
+Which is fine. Caching is often the correct answer. But it is a trade, and the thing you are trading away is your ability to reason about what a user is looking at.
+
+Start with the question nobody asks: how wrong is this allowed to be. A view counter can be an hour stale and nobody will ever know. A published article can be a minute stale. An account balance cannot be stale at all, and if it is, you will find out from a support ticket written in capital letters. Every caching decision is downstream of that one number, and most teams never say it out loud.
+
+Then ask the harder question: what happens when the cache is empty. Not eventually — right now, at peak traffic, because someone deployed and the process restarted. If a thousand requests all miss at the same moment, they all run the expensive query at the same moment, and the database that was comfortable at eighty percent falls over. That is a stampede, and it is the reason caching sometimes makes things dramatically worse rather than slightly better. The fix is a lock, or a stale-while-revalidate policy, and neither is the default in any cache library you will reach for.
+
+And the question people get wrong most often: how does this entry get out. Time-based expiry is the easy answer and it is usually the right one, because it needs no coordination and it cannot leak. Explicit invalidation is more precise and much harder, because it requires you to know every place that writes the underlying data, forever, including the management command someone adds next year.
+
+If you take one habit from this, take this one: cache the expensive thing, not the page. A whole rendered page is one enormous entry that goes stale all at once and is personalised, which means it is either wrong or not shared. The aggregate query that takes 400ms is a small entry, shared by everyone, and safe to be a minute old. The first is a liability. The second is nearly free.
+
+There is also the cache you already have and are probably wasting. HTTP caching — ETag, Last-Modified, Cache-Control — pushes the copy all the way out to the browser and to whatever CDN sits in front of you. No round trip at all is faster than the fastest Redis lookup you will ever write, and Django ships the middleware for it.
+
+Last thing, and it is the one that matters most. Before you cache anything, find out why the page is slow. Half the time the answer is a foreign key in a template loop and the fix is one call to select_related. Caching an N+1 does not fix the N+1. It hides it, gives it a sixty second fuse, and hands the next person a much more confusing problem than the one you had.""",
+    },
+    {
+        # A deliberate draft. Log in as `aviral` or any Editor to see it —
+        # everyone else gets a 404 on its URL, including the archive.
+        'title': 'Permissions are a data model, not a decorator',
+        'category': 'Django',
+        'author': 'aviral',
+        'status': 'draft',
+        'days_ago': 1,
+        'content': """Notes for a longer piece. Do not publish yet — the second half is still a list of grievances rather than an argument.
+
+Every access-control bug I have seen came from the same mistake: treating permission as something you check at the door, when it is actually something the data knows about itself.
+
+The decorator version is seductive because it reads so well. login_required on top of the view, permission_required underneath it, done. And it is genuinely correct for the question it answers, which is may this kind of user perform this kind of action. Can they write posts at all. Can they reach the admin. Coarse verbs, model-wide, no rows involved.
+
+It falls apart the moment the answer depends on which row. May this user edit this post. The decorator has never heard of the post. It ran before the view fetched anything. So the check moves into the view body, and then it is copy-pasted into the second view, and the third, and eventually into a template, and now the rule that authors may only edit their own work exists in five places and two of them are wrong.
+
+The version that survives puts the question where the data is. post.is_editable_by(user). One method, one definition, called by the view before it saves and by the template before it renders the button. The view cannot drift from the template because they are asking the same object the same question.
+
+The distinction to hold on to is that Django permissions gate the verb and ownership gates the row. blog.change_post means you are the kind of account that edits posts. post.author == user means this is yours. You need both, and conflating them is how you end up with an author who can edit the entire magazine.
+
+Groups are the other half nobody teaches properly. Never assign a permission to a user. Assign it to a group, put the user in the group, keep the group definition in version control where a code review can see it. Permissions handed out one at a time in the admin are invisible, undocumented and impossible to audit six months later.
+
+TODO: write the section about the third failure — hiding a button and calling it security. The button is a hint. The check in the view is the security. If the only thing stopping a request is that the UI did not offer it, curl does not care.
+
+TODO: something about 403 versus 404, and why a draft has to 404. A 403 on a URL is a confirmation that the URL is real.
+
+TODO: object-level permission libraries. Probably do not need one. Say why.""",
+    },
 ]
 
 
 # Slug is generated from the title, so these keys match what Post.save() builds.
+# Each tuple is (username, body, days_ago) — the username must exist in PEOPLE.
 COMMENTS = {
     'the-n1-query-is-the-most-expensive-bug-you-will-never-see': [
         ('rohan_dev', 'Found three of these in our admin views ten minutes after reading this. One list page went from 240 queries to 4.', 3),
@@ -225,5 +387,19 @@ COMMENTS = {
     'your-dev-environment-is-a-science-experiment': [
         ('lena', 'The onboarding stopwatch is brutal and correct. We found six broken steps the first time we tried it.', 70),
         ('bhaskar', 'Services in Docker, app on the host, is exactly where we landed after two years of arguing about it.', 66),
+    ],
+    'the-database-is-not-a-queue': [
+        ('half_awake_ops', 'We ran the naive version for eight months before anyone noticed the duplicate charges. SKIP LOCKED the same week we found it.', 84),
+        ('priya', 'The point about it breaking statistically rather than loudly is the part I will be quoting in design reviews.', 80),
+        ('sam.qa', 'Counterpoint: the lease timestamp is doing a lot of work in that recommendation and it is the bit everyone forgets.', 74),
+    ],
+    'half-your-tests-are-testing-django': [
+        ('irfan', 'Deleted forty tests after reading this. Suite went from 90 seconds to 31 and I do not miss any of them.', 96),
+        ('devika', 'setUpTestData versus setUp is genuinely the cheapest speedup in a Django suite and almost nobody knows it exists.', 92),
+        ('t.builds', 'Disagree slightly on coverage. It is a bad goal but a good tripwire on files that should never be untested.', 88),
+    ],
+    'caching-is-a-bet-about-the-future': [
+        ('marcus', 'Caching an N+1 does not fix the N+1. Putting that on a poster above the desk.', 112),
+        ('ana_m', 'The stampede section deserves its own article. We took an outage from exactly this after a routine deploy.', 106),
     ],
 }

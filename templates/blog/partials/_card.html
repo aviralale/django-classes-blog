@@ -1,3 +1,4 @@
+{% load blog_extras %}
 <article class="card">
     <figure class="card__figure">
         <a href="{{ post.get_absolute_url }}">
@@ -5,13 +6,16 @@
         </a>
     </figure>
 
-    {% if post.category %}
-        <p class="kicker kicker--accent">{{ post.category.name }}</p>
-    {% endif %}
+    <p class="card__kicker">
+        {% if post.category %}
+            <span class="kicker kicker--accent">{{ post.category.name }}</span>
+        {% endif %}
+        {% if not post.is_published %}<span class="badge badge--draft">Draft</span>{% endif %}
+    </p>
 
     <h3 class="card__title"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
 
     <p class="card__excerpt">{{ post.excerpt }}</p>
 
-    <p class="meta card__foot">{{ post.author.username }} · {{ post.created_at|date:"j M Y" }} · {{ post.reading_time }} min</p>
+    <p class="meta card__foot">{{ post.author|display_name }} · {{ post.published_at|default:post.created_at|date:"j M Y" }} · {{ post.reading_time }} min</p>
 </article>

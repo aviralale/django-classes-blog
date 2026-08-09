@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% comment %}
+Rendered whenever a view raises PermissionDenied, or a decorator with
+`raise_exception=True` refuses. The difference from a 404 matters: 403 means
+"this exists and you may not", 404 means "as far as you are concerned there
+is nothing here". Drafts use 404 on purpose.
+{% endcomment %}
+
+{% block title %}Not allowed{% endblock %}
+
+{% block content %}
+<div class="shell shell--narrow" style="text-align:center;padding:6rem 0">
+    <p class="kicker kicker--accent">403</p>
+    <h1 class="article__title" style="font-size:clamp(2rem,5vw,3rem)">That is not yours</h1>
+    <p class="dek">You are signed in, you are just not allowed to do this one.</p>
+    <p class="ornament">❦</p>
+    <p><a class="btn" href="{% url 'blog:home' %}">Back to the front page</a></p>
+</div>
+{% endblock %}

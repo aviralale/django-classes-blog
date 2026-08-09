@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="shell shell--narrow">
+
+    <header class="article__head">
+        <p class="kicker kicker--accent">Careful</p>
+        <h1 class="article__title" style="font-size:clamp(1.8rem,4vw,2.4rem)">Delete “{{ post.title }}”?</h1>
+        <p class="dek">
+            This removes the post, its cover and its
+            {{ post.comments.count }} comment{{ post.comments.count|pluralize }}. There is no undo.
+        </p>
+    </header>
+
+    {% comment %}
+    The confirmation is a POST with a CSRF token. The page you arrived on was a
+    GET, which changed nothing — that is the whole point of the two-step dance.
+    {% endcomment %}
+    <form method="post" class="form">
+        {% csrf_token %}
+        <button class="btn btn--danger" type="submit">Yes, delete it</button>
+        <a class="btn btn--ghost" href="{{ post.get_absolute_url }}">Keep it</a>
+    </form>
+
+</div>
+{% endblock %}

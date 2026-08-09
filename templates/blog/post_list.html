@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load blog_extras %}
 
 {% block title %}Archive{% endblock %}
 
@@ -10,18 +11,19 @@
 
     <form class="search" method="GET" role="search">
         <input type="search" name="q" placeholder="Search titles and text…" value="{{ query }}" aria-label="Search posts">
+        {% if active_category %}<input type="hidden" name="category" value="{{ active_category.slug }}">{% endif %}
         <button class="btn" type="submit">Search</button>
     </form>
 
     {% if categories %}
         <ul class="rail" style="margin-bottom:2.5rem">
             <li>
-                <a class="chip {% if not active_category %}chip--on{% endif %}" href="{% url 'blog:post_list' %}{% if query %}?q={{ query|urlencode }}{% endif %}">All</a>
+                <a class="chip {% if not active_category %}chip--on{% endif %}" href="{% query_string category=None page=None %}">All</a>
             </li>
             {% for category in categories %}
                 <li>
                     <a class="chip {% if active_category.pk == category.pk %}chip--on{% endif %}"
-                       href="?category={{ category.pk }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}">
+                       href="{% query_string category=category.slug page=None %}">
                         {{ category.name }}<span class="chip__count">{{ category.post_count }}</span>
                     </a>
                 </li>
@@ -30,7 +32,7 @@
     {% endif %}
 
     <p class="meta">
-        {{ posts|length }} result{{ posts|length|pluralize }}
+        {{ total }} result{{ total|pluralize }}
         {% if query %} for “{{ query }}”{% endif %}
         {% if active_category %} in {{ active_category.name }}{% endif %}
     </p>
@@ -44,6 +46,8 @@
             <p class="empty">Nothing matches that. Try fewer words.</p>
         {% endfor %}
     </div>
+
+    {% include 'blog/partials/_pagination.html' %}
 
 </div>
 {% endblock %}

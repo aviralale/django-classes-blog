@@ -1,0 +1,24 @@
+{% load blog_extras %}
+{% comment %}
+`query_string` rebuilds the current URL with only `page` changed, so paging
+through search results does not silently drop the search term.
+{% endcomment %}
+{% if page.paginator.num_pages > 1 %}
+    <nav class="pagination" aria-label="Pagination">
+        {% if page.has_previous %}
+            <a class="pagination__step" href="{% query_string page=page.previous_page_number %}">← Newer</a>
+        {% else %}
+            <span class="pagination__step pagination__step--off">← Newer</span>
+        {% endif %}
+
+        <span class="pagination__count">
+            Page {{ page.number }} of {{ page.paginator.num_pages }}
+        </span>
+
+        {% if page.has_next %}
+            <a class="pagination__step" href="{% query_string page=page.next_page_number %}">Older →</a>
+        {% else %}
+            <span class="pagination__step pagination__step--off">Older →</span>
+        {% endif %}
+    </nav>
+{% endif %}

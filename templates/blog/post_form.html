@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% comment %}
+One template for both creating and editing. The view passes the heading and
+the button label, so there is no second copy of this markup to keep in sync.
+{% endcomment %}
+
+{% block title %}{{ heading }}{% endblock %}
+
+{% block content %}
+<div class="shell shell--narrow">
+
+    <header class="article__head">
+        <p class="kicker kicker--accent">{{ kicker }}</p>
+        <h1 class="article__title" style="font-size:clamp(2rem,4.5vw,2.9rem)">{{ heading }}</h1>
+        <p class="dek">{{ dek }}</p>
+    </header>
+
+    <form class="form" method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="notice">
+                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            {% include 'blog/partials/_field.html' %}
+        {% endfor %}
+
+        <button class="btn" type="submit">{{ submit_label }}</button>
+        {% if post %}
+            <a class="btn btn--ghost" href="{{ post.get_absolute_url }}">Cancel</a>
+        {% else %}
+            <a class="btn btn--ghost" href="{% url 'blog:home' %}">Cancel</a>
+        {% endif %}
+    </form>
+
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% comment %}
+Django looks for `404.html` at the root of your template dirs, automatically,
+with no view and no URL. You only ever see it when DEBUG = False — with DEBUG
+on you get the yellow traceback page instead.
+{% endcomment %}
+
+{% block title %}Not found{% endblock %}
+
+{% block content %}
+<div class="shell shell--narrow" style="text-align:center;padding:6rem 0">
+    <p class="kicker kicker--accent">404</p>
+    <h1 class="article__title" style="font-size:clamp(2rem,5vw,3rem)">No such page</h1>
+    <p class="dek">Either it was never here, or it is a draft that is none of your business.</p>
+    <p class="ornament">❦</p>
+    <p><a class="btn" href="{% url 'blog:home' %}">Back to the front page</a></p>
+</div>
+{% endblock %}
