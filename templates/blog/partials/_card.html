@@ -1,0 +1,17 @@
+<article class="card">
+    <figure class="card__figure">
+        <a href="{{ post.get_absolute_url }}">
+            <img src="{{ post.featured_image.url }}" alt="Cover for {{ post.title }}" loading="lazy">
+        </a>
+    </figure>
+
+    {% if post.category %}
+        <p class="kicker kicker--accent">{{ post.category.name }}</p>
+    {% endif %}
+
+    <h3 class="card__title"><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+
+    <p class="card__excerpt">{{ post.excerpt }}</p>
+
+    <p class="meta card__foot">{{ post.author }} · {{ post.created_at|date:"j M Y" }} · {{ post.reading_time }} min</p>
+</article>

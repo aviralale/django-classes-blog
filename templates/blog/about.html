@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}About{% endblock %}
+
+{% block content %}
+<div class="shell shell--narrow">
+
+    <header class="article__head">
+        <p class="kicker kicker--accent">Colophon</p>
+        <h1 class="article__title">About Ctrl Bits</h1>
+        <p class="article__byline">
+            <span class="meta">{{ total }} piece{{ total|pluralize }} published</span>
+            <span class="dot">·</span>
+            <span class="meta">{{ categories|length }} section{{ categories|length|pluralize }}</span>
+        </p>
+    </header>
+
+    <div class="prose">
+        <p>This is a small publication about building software. No growth hacks, no thought leadership, no ten-slide carousel explaining what an API is.</p>
+
+        <p>Everything here comes out of actual work: things that broke in production, decisions that looked smart in the planning doc and stupid three months later, tools that earned their place and tools that did not. If a post says a technique works, it is because it worked on something real, not because it read well.</p>
+
+        <p>The site itself is deliberately boring technology. Django on the back, server-rendered HTML on the front, SQLite underneath. No client-side framework, no build step, no hydration. It loads fast because there is almost nothing to load.</p>
+
+        <p>The look is borrowed from print — a serif you can read for twenty minutes, generous margins, real hierarchy, and grain on the paper. Screens have spent fifteen years imitating apps. Reading is still better on a page.</p>
+
+        <p>Comments are open on every post and go straight up, unmoderated, because moderating a blog nobody has found yet is a strange use of an evening.</p>
+
+        <p>Want to publish here? The desk is open — hit <a href="{% url 'blog:post_create' %}">Write</a> and file something.</p>
+    </div>
+
+    <p class="ornament">❦</p>
+
+    {% if categories %}
+        <div class="section-rule">
+            <h2 class="kicker">Sections</h2>
+        </div>
+        <ul class="rail">
+            {% for category in categories %}
+                <li>
+                    <a class="chip" href="{% url 'blog:post_list' %}?category={{ category.pk }}">
+                        {{ category.name }}<span class="chip__count">{{ category.post_count }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+</div>
+{% endblock %}

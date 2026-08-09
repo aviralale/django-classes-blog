@@ -1,50 +1,81 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
-from .models import Post, Category, Comment
+from django.db.models import Count, Q
+from .models import Post, Category
+from .forms import CommentForm, PostForm
+
 
 # Create your views here.
 # def index(request):
 #     return HttpResponse("<h1>Hello my name is aviral</h1>")
 
 def index(request):
-    posts = Post.objects.all()
-    categories = Category.objects.all()
+    posts = Post.objects.select_related('category')
+    categories = Category.objects.annotate(post_count=Count('post')).filter(post_count__gt=0)
+    lead = posts.first()
     return render(request, 'blog/home.html', {
-        'posts': posts, 
-        'categories': categories
+        'lead': lead,
+        'posts': posts[1:],
+        'categories': categories,
+        'total': posts.count(),
     })
 
 def post_detail(request, slug):
     # post = Post.objects.get(slug=slug)
-    post = get_object_or_404(Post, slug=slug)
-    errors = []
-    name = ''
-    content = ''
+    post = get_object_or_404(Post.objects.select_related('category'), slug=slug)
 
     if request.method == 'POST':
-        name = request.POST.get('name', '')
-        content = request.POST.get('content', '')
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.save()
+            return redirect('blog:post_detail', slug=post.slug)
+    else:
+        form = CommentForm()
 
-        if not name:
-            errors.append('Name is required!')
-        
-        elif len(name) >= 100:
-            errors.append('Name is too long.')
-        
-        if not content:
-            errors.append('Content is required!')
-        
-        if not errors:
-            Comment.objects.create(post=post, name=name, content=content)
-            redirect('blog:post_detail', slug=post.slug)
+    related = Post.objects.filter(category=post.category).exclude(pk=post.pk)[:3]
 
-    return render(request, 'blog/post_detail.html', 
-    {
+    return render(request, 'blog/post_detail.html', {
         'post': post,
-        'errors': errors,
-        'name': name,
-        'content': content
-        })
+        'form': form,
+        'comments': post.comments.all(),
+        'related': related,
+    })
+
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save()
+            return redirect('blog:post_detail', slug=post.slug)
+    else:
+        form = PostForm()
+    return render(request, 'blog/post_create.html', {'form': form})
 
 def about(request):
-    return HttpResponse("<h1>I study at Texas</h1>")
+    return render(request, 'blog/about.html', {
+        'total': Post.objects.count(),
+        'categories': Category.objects.annotate(post_count=Count('post')).filter(post_count__gt=0),
+    })
+
+def post_list(request):
+    query = request.GET.get('q', '')
+    category_id = request.GET.get('category', '')
+
+    posts = Post.objects.select_related('category')
+    if query:
+        posts = posts.filter(Q(title__icontains=query) | Q(content__icontains=query))
+
+    active_category = None
+    if category_id.isdigit():
+        active_category = Category.objects.filter(pk=category_id).first()
+        if active_category:
+            posts = posts.filter(category=active_category)
+
+    context = {
+        'posts': posts,
+        'query': query,
+        'categories': Category.objects.annotate(post_count=Count('post')).filter(post_count__gt=0),
+        'active_category': active_category,
+    }
+    return render(request, 'blog/post_list.html', context)

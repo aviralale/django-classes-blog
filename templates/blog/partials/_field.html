@@ -1,0 +1,18 @@
+{% comment %}
+Renders one bound form field with its label, help text and errors.
+Used by every form on the site so they all look the same.
+{% endcomment %}
+<div class="field {% if field.errors %}field--error{% endif %}">
+    {{ field.label_tag }}
+    {{ field }}
+    {% if field.help_text %}
+        <small class="field__help">{{ field.help_text }}</small>
+    {% endif %}
+    {% if field.errors %}
+        <ul class="field__errors">
+            {% for error in field.errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>

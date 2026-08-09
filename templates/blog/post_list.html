@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Archive{% endblock %}
+
+{% block content %}
+<div class="shell">
+
+    <p class="kicker">The archive</p>
+    <h1 style="font-size:clamp(2rem,4.5vw,2.75rem);margin:.6rem 0 1.75rem">Everything, in one place</h1>
+
+    <form class="search" method="GET" role="search">
+        <input type="search" name="q" placeholder="Search titles and text…" value="{{ query }}" aria-label="Search posts">
+        <button class="btn" type="submit">Search</button>
+    </form>
+
+    {% if categories %}
+        <ul class="rail" style="margin-bottom:2.5rem">
+            <li>
+                <a class="chip {% if not active_category %}chip--on{% endif %}" href="{% url 'blog:post_list' %}{% if query %}?q={{ query|urlencode }}{% endif %}">All</a>
+            </li>
+            {% for category in categories %}
+                <li>
+                    <a class="chip {% if active_category.pk == category.pk %}chip--on{% endif %}"
+                       href="?category={{ category.pk }}{% if query %}&amp;q={{ query|urlencode }}{% endif %}">
+                        {{ category.name }}<span class="chip__count">{{ category.post_count }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <p class="meta">
+        {{ posts|length }} result{{ posts|length|pluralize }}
+        {% if query %} for “{{ query }}”{% endif %}
+        {% if active_category %} in {{ active_category.name }}{% endif %}
+    </p>
+
+    <hr class="hairline" style="margin:1.25rem 0 0">
+
+    <div class="grid">
+        {% for post in posts %}
+            {% include 'blog/partials/_card.html' %}
+        {% empty %}
+            <p class="empty">Nothing matches that. Try fewer words.</p>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

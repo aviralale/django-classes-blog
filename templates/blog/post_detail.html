@@ -1,55 +1,85 @@
 {% extends 'base.html' %}
-{% block title %}{{post.title}}{% endblock %}
+
+{% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
-    <h1>{{post.title}}</h1>
-    <p>{{post.content}}</p>
-    <p>Category: {{post.category}}</p>
-    <p>At {{post.created_at}} by {{post.author}}</p>
-    <h2>Comments</h2>
+<div class="shell shell--narrow">
 
-    <form method="post">
-        {% csrf_token %}
-
-        {% if errors %}
-        <ul style="color:red;">
-            {% for error in errors %}
-            <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
+    <header class="article__head">
+        {% if post.category %}
+            <p class="kicker kicker--accent">{{ post.category.name }}</p>
         {% endif %}
 
-        <label for="username">Your name:</label>
-        <input type="text" id="username" name="name" value={{ name }}>
-        <label for="comment">Comment:</label>
-        <textarea name="content" id="comment" value={{ content }}></textarea>
-        <button type="submit">Post a comment</button>
-    </form>
+        <h1 class="article__title">{{ post.title }}</h1>
 
+        <p class="article__byline">
+            <span class="meta">By {{ post.author }}</span>
+            <span class="dot">·</span>
+            <span class="meta">{{ post.created_at|date:"j F Y" }}</span>
+            <span class="dot">·</span>
+            <span class="meta">{{ post.reading_time }} min read</span>
+        </p>
+    </header>
 
-    {% for comment in post.comments.all %}
-    <div>
-        <strong>{{comment.name}}</strong>
-        <p>{{comment.content}}</p>
-        <p>{{comment.created_at}}</p>
-    </div>
-    {% empty %}
-        <p>No comments yet.</p>
-    {% endfor %}
+    <figure class="article__figure">
+        <img src="{{ post.featured_image.url }}" alt="Cover for {{ post.title }}">
+    </figure>
+
+    <div class="prose">{{ post.content|linebreaks }}</div>
+
+    <p class="ornament">✦ ✦ ✦</p>
+
+    <section class="comments">
+        <div class="section-rule">
+            <h2 class="kicker">Comments ({{ comments|length }})</h2>
+        </div>
+
+        {% for comment in comments %}
+            <article class="comment">
+                <div class="comment__head">
+                    <span class="comment__name">{{ comment.name }}</span>
+                    <span class="meta">{{ comment.created_at|date:"j M Y" }}</span>
+                </div>
+                <div class="comment__body">{{ comment.content|linebreaks }}</div>
+            </article>
+        {% empty %}
+            <p class="empty">No comments yet. Somebody has to go first.</p>
+        {% endfor %}
+
+        <hr class="hairline">
+
+        <form class="form" method="post" novalidate>
+            {% csrf_token %}
+
+            <p class="kicker" style="margin-bottom:1.25rem">Leave a comment</p>
+
+            {% if form.non_field_errors %}
+                <div class="notice">
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                {% include 'blog/partials/_field.html' %}
+            {% endfor %}
+
+            <button class="btn" type="submit">Post comment</button>
+        </form>
+    </section>
+
+    {% if related %}
+        <hr class="hairline" style="margin-top:4.5rem">
+
+        <div class="section-rule">
+            <h2 class="kicker">Keep reading</h2>
+        </div>
+
+        <div class="grid">
+            {% for post in related %}
+                {% include 'blog/partials/_card.html' %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
 {% endblock %}
-
-
-{% comment %} <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>{{post.title}}</h1>
-    <p>{{post.content}}</p>
-    <p>Category: {{post.category}}</p>
-    <p>At {{post.created_at}} by {{post.author}}</p>
-</body>
-</html> {% endcomment %}

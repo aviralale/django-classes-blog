@@ -4,27 +4,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %} | My Blog</title>
-    <link rel="stylesheet" href={% static 'css/style.css' %}>
+    <title>{% block title %}{% endblock %} · Ctrl Bits</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..700;1,400..600&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href={% url 'blog:home' %}>Home</a></li>
-                <li><a href='/about'>About</a></li>
-                <li><a href="#">Search</a></li>
-            </ul>
-        </nav>
+    <header class="masthead">
+        <div class="masthead__inner">
+            <a class="wordmark" href="{% url 'blog:home' %}">
+                <span class="wordmark__name">Ctrl&nbsp;Bits</span>
+                <span class="wordmark__rule"></span>
+                <span class="wordmark__tagline">Notes on code, craft &amp; the occasional disaster</span>
+            </a>
+
+            <nav aria-label="Primary">
+                <ul class="nav">
+                    <li><a href="{% url 'blog:home' %}" {% if request.resolver_match.url_name == 'home' %}aria-current="page"{% endif %}>Latest</a></li>
+                    <li><a href="{% url 'blog:post_list' %}" {% if request.resolver_match.url_name == 'post_list' %}aria-current="page"{% endif %}>Archive</a></li>
+                    <li><a href="{% url 'blog:post_create' %}" {% if request.resolver_match.url_name == 'post_create' %}aria-current="page"{% endif %}>Write</a></li>
+                    <li><a href="{% url 'blog:about' %}" {% if request.resolver_match.url_name == 'about' %}aria-current="page"{% endif %}>About</a></li>
+                </ul>
+            </nav>
+        </div>
+        <hr class="masthead__rule">
     </header>
 
     <main>
-        {% block content %} {% endblock %}
+        {% block content %}{% endblock %}
     </main>
 
-    <footer>
-        Copyright 2026
+    <footer class="footer">
+        <div class="footer__inner">
+            <p class="meta" style="margin:0">© {% now "Y" %} Ctrl Bits — written by hand</p>
+            <p class="meta" style="margin:0">Set in Fraunces &amp; EB&nbsp;Garamond · <a href="{% url 'blog:post_create' %}">Submit a piece</a></p>
+        </div>
     </footer>
-
 </body>
 </html>

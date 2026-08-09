@@ -1,50 +1,63 @@
 {% extends 'base.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Latest{% endblock %}
 
 {% block content %}
-    <h1>Welcome to my blog</h1>
-    <h2>Categories</h2>
-    <ul>
-        {% for category in categories %}
-            <li>{{ category.name }}</li>
-        {% endfor %}
-    </ul>
-    <h2>Latest Posts</h2>
-    {% for post in posts %}
-        <div>
-            <a href={% url 'blog:post_detail' post.slug %}>
-                <img src={{post.featured_image.url}} alt={{post.title}} width="400"/>
-                <h3>{{post.title}}</h3>
-            
-            </a>
-            <p>{{post.content}}</p>
-            <p> Category: {{post.category.name}}</p>
-            <p>At {{post.created_at}} by {{post.author}}</p>
-        </div>
-        {% endfor %}
+<div class="shell">
+
+    <p class="kicker" style="margin-bottom:2rem">{% now "F Y" %} &nbsp;·&nbsp; {{ total }} piece{{ total|pluralize }} in the archive</p>
+
+    {% if lead %}
+        <article class="lead">
+            <div>
+                {% if lead.category %}
+                    <p class="kicker kicker--accent">{{ lead.category.name }}</p>
+                {% endif %}
+                <h1 class="lead__title"><a href="{{ lead.get_absolute_url }}">{{ lead.title }}</a></h1>
+                <p class="dek">{{ lead.excerpt }}</p>
+                <p class="meta">{{ lead.author }} &nbsp;·&nbsp; {{ lead.created_at|date:"j F Y" }} &nbsp;·&nbsp; {{ lead.reading_time }} min read</p>
+            </div>
+
+            <figure class="lead__figure">
+                <a href="{{ lead.get_absolute_url }}">
+                    <img src="{{ lead.featured_image.url }}" alt="Cover for {{ lead.title }}">
+                </a>
+            </figure>
+        </article>
+
+        {% if categories %}
+            <div class="section-rule">
+                <h2 class="kicker">Sections</h2>
+            </div>
+            <ul class="rail" style="margin-bottom:3.5rem">
+                {% for category in categories %}
+                    <li>
+                        <a class="chip" href="{% url 'blog:post_list' %}?category={{ category.pk }}">
+                            {{ category.name }}<span class="chip__count">{{ category.post_count }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if posts %}
+            <div class="section-rule">
+                <h2 class="kicker">More from the archive</h2>
+            </div>
+
+            <div class="grid">
+                {% for post in posts %}
+                    {% include 'blog/partials/_card.html' %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <p class="ornament">❦</p>
+
+    {% else %}
+        <p class="empty">Nothing published yet. The presses are cold.</p>
+        <p><a class="btn" href="{% url 'blog:post_create' %}">Write the first one</a></p>
+    {% endif %}
+
+</div>
 {% endblock %}
-
-
-{% comment %} <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Blog</title>
-</head>
-<body>
-    <h1>Welcome to my blog</h1>
-    <h2>Latest Posts</h2>
-    {% for post in posts %}
-        <div>
-            <h3>{{post.title}}</h3>
-            <p>{{post.content}}</p>
-            <p> Category: {{post.category}}</p>
-            <p>At {{post.created_at}} by {{post.author}}</p>
-        </div>
-        {% endfor %}
-
-</body>
-</html> {% endcomment %}
-
